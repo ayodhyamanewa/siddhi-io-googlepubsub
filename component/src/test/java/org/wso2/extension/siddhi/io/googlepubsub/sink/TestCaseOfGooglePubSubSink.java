@@ -36,7 +36,6 @@ public class TestCaseOfGooglePubSubSink {
     private static Logger log = Logger.getLogger(TestCaseOfGooglePubSubSink.class);
     private volatile int count;
     private volatile boolean eventArrived;
-    private String serviceAccountFilePath = "src/test/";
 
     @BeforeMethod
     public void initBeforeMethod() {
@@ -54,7 +53,6 @@ public class TestCaseOfGooglePubSubSink {
         log.info("------------------------------------------------------------------------------------------");
         log.info("Test to configure GooglePubSubSink publish messages to a topic in the GooglePubSub Server.");
         log.info("------------------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         ResultContainer resultContainer = new ResultContainer(2, 3);
         TestSubscriber testClient = new TestSubscriber("sp-path-1547649404768", "topicD",
                 "subD", resultContainer);
@@ -64,7 +62,7 @@ public class TestCaseOfGooglePubSubSink {
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
                         + "topic.id = 'topicD', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
@@ -104,19 +102,18 @@ public class TestCaseOfGooglePubSubSink {
      * messages to that topic in the GooglePubSub server.
      */
     @Test
-    public void googlePubSubSimplePublishTest2() {
+    public void googlePubSubSimplePublishTest2() throws InterruptedException {
 
         log.info("----------------------------------------------------------------------------------------------");
         log.info("If a topic does not exist in the server,GooglePubSubSink creates a topic and publish messages.");
         log.info("----------------------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         // deploying the execution plan
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
-                        + "topic.id = 'topickd111', "
-                        + "file.name = 'sp.json',"
+                        + "topic.id = 'topickd31221', "
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
@@ -133,11 +130,7 @@ public class TestCaseOfGooglePubSubSink {
             }
         });
         siddhiAppRuntime.start();
-        try {
-            fooStream.send(new Object[]{"University of Jaffna"});
-        } catch (InterruptedException e) {
-            AssertJUnit.fail("Thread sleep was  interrupted");
-        }
+        fooStream.send(new Object[]{"University of Jaffna"});
         AssertJUnit.assertTrue(eventArrived);
         siddhiAppRuntime.shutdown();
     }
@@ -152,14 +145,13 @@ public class TestCaseOfGooglePubSubSink {
         log.info("-----------------------------------------------------------");
         log.info("Test to publish messages when missing a mandatory property.");
         log.info("-----------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         // deploying the execution plan
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
                         + "topic.id = 'topicJ', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
                         + "from FooStream select message insert into BarStream;");
@@ -177,14 +169,13 @@ public class TestCaseOfGooglePubSubSink {
         log.info("------------------------------------------------------------------------------------------------");
         log.info("Test to publish messages without specifying the service account credentials file name correctly.");
         log.info("------------------------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         // deploying the execution plan
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
                         + "topic.id = 'topicD', "
-                        + "file.name = 'sonnb',"
+                        + "credential.path = 'src/test/resources/security/sp',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
@@ -203,14 +194,13 @@ public class TestCaseOfGooglePubSubSink {
         log.info("------------------------------------------------------------------------------");
         log.info("Test to publish messages to a project without enabling billing in the project.");
         log.info("------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         // deploying the execution plan
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
                         + "topic.id = 'topicD', "
-                        + "file.name = 'Blue Eye-3d5d8a888785.json',"
+                        + "credential.path = 'src/test/resources/security/Blue Eye-3d5d8a888785.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
@@ -224,30 +214,25 @@ public class TestCaseOfGooglePubSubSink {
      * Google Pub Sub server.
      */
     @Test(expectedExceptions = SiddhiAppCreationException.class)
-    public void googlePubSubSimplePublishTest3() {
+    public void googlePubSubSimplePublishTest3() throws InterruptedException {
 
         log.info("-----------------------------------------------------------------");
         log.info("Test to publish messages to a non-existing project in the server.");
         log.info("-----------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         // deploying the execution plan
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
                         + "topic.id = 'topicD', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'bvjj04768', "
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
                         + "from FooStream select message insert into BarStream;");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-        try {
-            fooStream.send(new Object[]{"World"});
-        } catch (InterruptedException e) {
-            AssertJUnit.fail("Thread sleep was  interrupted");
-        }
+        fooStream.send(new Object[]{"World"});
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
     }
@@ -256,30 +241,25 @@ public class TestCaseOfGooglePubSubSink {
      * Test to configure the GooglePubSub Sink publishes messages to a topic by specifying project.id as empty
      */
     @Test(expectedExceptions = SiddhiAppCreationException.class)
-    public void googlePubSubSimplePublishTest4() {
+    public void googlePubSubSimplePublishTest4() throws InterruptedException {
 
-        log.info("-----------------------------------------------------------------");
-        log.info("Test to publish messages to a non-existing project in the server.");
-        log.info("-----------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
+        log.info("-----------------------------------------------------------");
+        log.info("Test to publish messages by specifying project.id as empty.");
+        log.info("-----------------------------------------------------------");
         SiddhiManager siddhiManager = new SiddhiManager();
         // deploying the execution plan
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "define stream FooStream (message string); " + "@info(name = 'query1') "
                         + "@sink(type='googlepubsub', "
                         + "topic.id = 'topicD', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = '', "
                         + "@map(type='text'))"
                         + "Define stream BarStream (message string);"
                         + "from FooStream select message insert into BarStream;");
         InputHandler fooStream = siddhiAppRuntime.getInputHandler("FooStream");
         siddhiAppRuntime.start();
-        try {
-            fooStream.send(new Object[]{"World"});
-        } catch (InterruptedException e) {
-            AssertJUnit.fail("Thread sleep was  interrupted");
-        }
+        fooStream.send(new Object[]{"World"});
         siddhiAppRuntime.start();
         siddhiAppRuntime.shutdown();
     }

@@ -52,7 +52,7 @@ import java.util.Map;
 @Extension(
         name = "googlepubsub",
         namespace = "source",
-        description = "A GooglePubSub Source receives events to be processed by Siddhi from a topic in GooglePubSub "
+        description = "A GooglePubSub Source receives events to be processed by Siddhi, from a topic in GooglePubSub "
                 + "Server.Here, a subscriber client creates a subscription to that topic and consumes messages from "
                 + "the subscription. Only messages published to the topic after the subscription is created are "
                 + "available to subscriber applications. The subscription connects the topic to a subscriber "
@@ -75,8 +75,8 @@ import java.util.Map;
                         type = DataType.STRING
                 ),
                 @Parameter(
-                        name = GooglePubSubConstants.CREDENTIAL_FILE_NAME,
-                        description = "The file name of the service account credentials.",
+                        name = GooglePubSubConstants.CREDENTIAL_PATH,
+                        description = "The file path of the service account credentials.",
                         type = DataType.STRING
                 ),
         },
@@ -91,7 +91,7 @@ import java.util.Map;
                         syntax = "@source(type='googlepubsub',@map(type='text'),\n"
                                 + "topic.id='topicA',\n"
                                 + "project.id='sp-path-1547649404768',\n"
-                                + "file.name = 'sp.json',\n"
+                                + "credential.path = 'src/test/resources/security/sp.json',\n"
                                 + "subscription.id='subA',\n"
                                 + ")\n"
                                 + "define stream outputStream(message String);"
@@ -101,7 +101,6 @@ import java.util.Map;
 
 public class GooglePubSubSource extends Source {
 
-    private SourceEventListener sourceEventListener;
     private String streamID;
     private String siddhiAppName;
     private SubscriptionAdminClient subscriptionAdminClient;
@@ -118,28 +117,23 @@ public class GooglePubSubSource extends Source {
                      String[] requestedTransportPropertyNames, ConfigReader configReader,
                      SiddhiAppContext siddhiAppContext) {
 
-        this.sourceEventListener = sourceEventListener;
         this.streamID = sourceEventListener.getStreamDefinition().getId();
         this.siddhiAppName = siddhiAppContext.getName();
         String subscriptionId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.SUBSCRIPTION_ID);
         this.topicId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.TOPIC_ID);
-        this.projectId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.
-                GOOGLE_PUB_SUB_SERVER_PROJECT_ID);
-        String credentialPath = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.CREDENTIAL_PATH,
-                GooglePubSubConstants.CREDENTIAL_PATH_VALUE);
-        String credentialFile = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.CREDENTIAL_FILE_NAME);
+        this.projectId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.GOOGLE_PUB_SUB_SERVER_PROJECT_ID);
+        String credentialPath = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.CREDENTIAL_PATH);
         googlePubSubMessageReceiver = new GooglePubSubMessageReceiver(sourceEventListener);
         this.topicName = ProjectTopicName.of(projectId, topicId);
         this.subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
-        String credential = credentialPath + credentialFile;
-        File credentialsPath = new File(credential);
+        File credentialsPath = new File(credentialPath);
         try {
             FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
             credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
         } catch (IOException e) {
             throw new SiddhiAppCreationException("The file that contains your service account credentials is not"
-                    + " found or you are not permitted to make authenticated calls.Check the file.name '"
-                    + credentialFile + "' defined in stream " + siddhiAppName + ": " + streamID , e);
+                    + " found or you are not permitted to make authenticated calls.Check the credential.path '"
+                    + credentialPath + "' defined in stream " + siddhiAppName + ": " + streamID, e);
         }
         createSubscription();
     }
@@ -152,9 +146,9 @@ public class GooglePubSubSource extends Source {
 
     @Override
     public void connect(ConnectionCallback connectionCallback) {
-        GooglePubSubMessageReceiver receiver = new GooglePubSubMessageReceiver(sourceEventListener);
-        subscriber = Subscriber.newBuilder(subscriptionName, receiver).setCredentialsProvider(FixedCredentialsProvider
-                .create(credentials)).build();
+
+        subscriber = Subscriber.newBuilder(subscriptionName, googlePubSubMessageReceiver).setCredentialsProvider
+                (FixedCredentialsProvider.create(credentials)).build();
         subscriber.startAsync().awaitRunning();
     }
 
@@ -203,8 +197,8 @@ public class GooglePubSubSource extends Source {
             SubscriptionAdminSettings subscriptionAdminSettings = SubscriptionAdminSettings.newBuilder()
                     .setCredentialsProvider(FixedCredentialsProvider.create(credentials)).build();
             subscriptionAdminClient = SubscriptionAdminClient.create(subscriptionAdminSettings);
-            subscriptionAdminClient.createSubscription(subscriptionName, topicName,
-                    PushConfig.getDefaultInstance(), 10);
+            subscriptionAdminClient.createSubscription(subscriptionName, topicName, PushConfig.getDefaultInstance(),
+                    10);
         } catch (ApiException e) {
             if (e.getStatusCode().getCode() != StatusCode.Code.ALREADY_EXISTS) {
                 throw new SiddhiAppCreationException("An error is caused due to resource " + e.getStatusCode().getCode()
@@ -214,7 +208,7 @@ public class GooglePubSubSource extends Source {
             }
         } catch (IOException e) {
             throw new SiddhiAppCreationException("Could not create a subscription " + subscriptionName + "to pull " +
-                    "messages from the google pub sub server.", e);
+                    "messages from the google pub sub server defined in stream " + siddhiAppName + ": " + streamID, e);
         } finally {
             if (subscriptionAdminClient != null) {
                 subscriptionAdminClient.shutdown();

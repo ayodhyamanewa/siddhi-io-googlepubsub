@@ -55,8 +55,8 @@ import java.util.concurrent.TimeUnit;
 @Extension(
         name = "googlepubsub",
         namespace = "sink",
-        description = "GooglePubSub Sink publishes messages to a topic in  GooglePubSub processed by Siddhi. If the "
-                + "required topic doesn't exist, GooglePubSub Sink creates a topic and publish messages to that topic.",
+        description = "GooglePubSub Sink publishes messages to a topic in  GooglePubSub server. If the required "
+                + "topic doesn't exist, GooglePubSub Sink creates a topic and publish messages to that topic.",
         parameters = {
                 @Parameter(
                         name = GooglePubSubConstants.GOOGLE_PUB_SUB_SERVER_PROJECT_ID,
@@ -70,8 +70,8 @@ import java.util.concurrent.TimeUnit;
                         type = DataType.STRING
                 ),
                 @Parameter(
-                        name = GooglePubSubConstants.CREDENTIAL_FILE_NAME,
-                        description = "The file name of the service account credentials.",
+                        name = GooglePubSubConstants.CREDENTIAL_PATH,
+                        description = "The file path of the service account credentials.",
                         type = DataType.STRING
                 ),
         },
@@ -85,7 +85,7 @@ import java.util.concurrent.TimeUnit;
 
                         syntax = "@sink(type = 'googlepubsub', @map(type= 'text'),\n"
                                 + "project.id = 'sp-path-1547649404768', \n"
-                                + "file.name = 'sp.json',\n"
+                                + "credential.path = 'src/test/resources/security/sp.json',\n"
                                 + "topic.id ='topicA',\n "
                                 + ")\n" +
                                 "define stream inputStream(message string);"),
@@ -115,7 +115,7 @@ public class GooglePubSubSink extends Sink {
     public String[] getSupportedDynamicOptions() {
 
         return new String[]{GooglePubSubConstants.TOPIC_ID, GooglePubSubConstants.GOOGLE_PUB_SUB_SERVER_PROJECT_ID,
-                GooglePubSubConstants.CREDENTIAL_FILE_NAME, GooglePubSubConstants.CREDENTIAL_PATH};
+                GooglePubSubConstants.CREDENTIAL_PATH};
     }
 
     @Override
@@ -125,21 +125,17 @@ public class GooglePubSubSink extends Sink {
         this.siddhiAppName = siddhiAppContext.getName();
         this.streamID = streamDefinition.getId();
         String topicId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.TOPIC_ID);
-        this.projectId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.
-                GOOGLE_PUB_SUB_SERVER_PROJECT_ID);
-        String credentialPath = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.CREDENTIAL_PATH,
-                GooglePubSubConstants.CREDENTIAL_PATH_VALUE);
-        String credentialFile = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.CREDENTIAL_FILE_NAME);
+        this.projectId = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.GOOGLE_PUB_SUB_SERVER_PROJECT_ID);
+        String credentialPath = optionHolder.validateAndGetStaticValue(GooglePubSubConstants.CREDENTIAL_PATH);
         this.topic = ProjectTopicName.of(projectId, topicId);
-        String credential = credentialPath + credentialFile;
-        File credentialsPath = new File(credential);
+        File credentialsPath = new File(credentialPath);
         try {
             FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
             credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
         } catch (IOException e) {
             throw new SiddhiAppCreationException("The file that contains your service account credentials is not "
-                    + "found or you are not permitted to make authenticated calls. Check the file.name '"
-                    + credentialFile + "' defined in stream " + siddhiAppName + " : " + streamID + ".", e);
+                    + "found or you are not permitted to make authenticated calls. Check the credential.path '"
+                    + credentialPath + "' defined in stream " + siddhiAppName + " : " + streamID + ".", e);
         }
         createTopic();
         try {
@@ -208,7 +204,7 @@ public class GooglePubSubSink extends Sink {
                 throw new SiddhiAppCreationException("An error is caused due to a resource "
                         + e.getStatusCode().getCode() + " in Google Pub Sub server." + " Check whether you have "
                         + "provided a proper project.id for '" + projectId + "' defined in stream " + siddhiAppName
-                        + ": " + streamID + " or you have enough access to use the resources in API. ", e);
+                        + ": " + streamID + " and make sure you have enough access to use all resources in API.", e);
             }
         } catch (IOException e) {
             throw new SiddhiAppCreationException("Could not create the topic " + topic + "in the google pub sub "

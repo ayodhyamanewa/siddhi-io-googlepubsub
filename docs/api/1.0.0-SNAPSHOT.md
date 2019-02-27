@@ -4,11 +4,11 @@
 
 ### googlepubsub *<a target="_blank" href="https://wso2.github.io/siddhi/documentation/siddhi-4.0/#sink">(Sink)</a>*
 
-<p style="word-wrap: break-word">GooglePubSub Sink publishes messages to a topic in  GooglePubSub processed by Siddhi. If the required topic doesn't exist, GooglePubSub Sink creates a topic and publish messages to that topic.</p>
+<p style="word-wrap: break-word">GooglePubSub Sink publishes messages to a topic in  GooglePubSub server. If the required topic doesn't exist, GooglePubSub Sink creates a topic and publish messages to that topic.</p>
 
 <span id="syntax" class="md-typeset" style="display: block; font-weight: bold;">Syntax</span>
 ```
-@sink(type="googlepubsub", project.id="<STRING>", topic.id="<STRING>", file.name="<STRING>", @map(...)))
+@sink(type="googlepubsub", project.id="<STRING>", topic.id="<STRING>", credential.path="<STRING>", @map(...)))
 ```
 
 <span id="query-parameters" class="md-typeset" style="display: block; color: rgba(0, 0, 0, 0.54); font-size: 12.8px; font-weight: bold;">QUERY PARAMETERS</span>
@@ -38,8 +38,8 @@
         <td style="vertical-align: top">No</td>
     </tr>
     <tr>
-        <td style="vertical-align: top">file.name</td>
-        <td style="vertical-align: top; word-wrap: break-word">The file name of the service account credentials.</td>
+        <td style="vertical-align: top">credential.path</td>
+        <td style="vertical-align: top; word-wrap: break-word">The file path of the service account credentials.</td>
         <td style="vertical-align: top"></td>
         <td style="vertical-align: top">STRING</td>
         <td style="vertical-align: top">No</td>
@@ -52,7 +52,7 @@
 ```
 @sink(type = 'googlepubsub', @map(type= 'text'),
 project.id = 'sp-path-1547649404768', 
-file.name = 'sp.json',
+credential.path = 'src/test/resources/security/sp.json',
 topic.id ='topicA',
  )
 define stream inputStream(message string);
@@ -63,11 +63,11 @@ define stream inputStream(message string);
 
 ### googlepubsub *<a target="_blank" href="https://wso2.github.io/siddhi/documentation/siddhi-4.0/#source">(Source)</a>*
 
-<p style="word-wrap: break-word">A GooglePubSub Source receives events to be processed by Siddhi from a topic in GooglePubSub Server.Here, a subscriber client creates a subscription to that topic and consumes messages from the subscription. Only messages published to the topic after the subscription is created are available to subscriber applications. The subscription connects the topic to a subscriber application that receives and processes messages published to the topic. A topic can have multiple subscriptions, but a given subscription belongs to a single topic.</p>
+<p style="word-wrap: break-word">A GooglePubSub Source receives events to be processed by Siddhi, from a topic in GooglePubSub Server.Here, a subscriber client creates a subscription to that topic and consumes messages from the subscription. Only messages published to the topic after the subscription is created are available to subscriber applications. The subscription connects the topic to a subscriber application that receives and processes messages published to the topic. A topic can have multiple subscriptions, but a given subscription belongs to a single topic.</p>
 
 <span id="syntax" class="md-typeset" style="display: block; font-weight: bold;">Syntax</span>
 ```
-@source(type="googlepubsub", project.id="<STRING>", topic.id="<STRING>", subscription.id="<STRING>", file.name="<STRING>", @map(...)))
+@source(type="googlepubsub", project.id="<STRING>", topic.id="<STRING>", subscription.id="<STRING>", credential.path="<STRING>", @map(...)))
 ```
 
 <span id="query-parameters" class="md-typeset" style="display: block; color: rgba(0, 0, 0, 0.54); font-size: 12.8px; font-weight: bold;">QUERY PARAMETERS</span>
@@ -105,8 +105,8 @@ define stream inputStream(message string);
         <td style="vertical-align: top">No</td>
     </tr>
     <tr>
-        <td style="vertical-align: top">file.name</td>
-        <td style="vertical-align: top; word-wrap: break-word">The file name of the service account credentials.</td>
+        <td style="vertical-align: top">credential.path</td>
+        <td style="vertical-align: top; word-wrap: break-word">The file path of the service account credentials.</td>
         <td style="vertical-align: top"></td>
         <td style="vertical-align: top">STRING</td>
         <td style="vertical-align: top">No</td>
@@ -120,7 +120,7 @@ define stream inputStream(message string);
 @source(type='googlepubsub',@map(type='text'),
 topic.id='topicA',
 project.id='sp-path-1547649404768',
-file.name = 'sp.json',
+credential.path = 'src/test/resources/security/sp.json',
 subscription.id='subA',
 )
 define stream outputStream(message String);

@@ -43,7 +43,6 @@ public class TestCaseOfGooglePubSubSource {
     private int timeout = 30000;
     private volatile boolean eventArrived;
     private volatile boolean eventArrived1;
-    private String serviceAccountFilePath = "src/test/";
 
     @BeforeMethod
     public void initBeforeMethod() {
@@ -61,14 +60,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("----------------------------------------------------------------------------");
         log.info("Test to receive messages by subscribing to a topic in google pub sub server.");
         log.info("----------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topic2', "
                         + "subscription.id = 'sub2', "
@@ -103,14 +101,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("--------------------------------------------------------------------------------------------------");
         log.info("Test to configure that multiple subscribers can subscribe for a single topic and consume messages.");
         log.info("--------------------------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topic4', "
                         + "subscription.id = 'sub4', "
@@ -123,7 +120,7 @@ public class TestCaseOfGooglePubSubSource {
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topic4', "
                         + "subscription.id = 'sub44', "
@@ -175,17 +172,16 @@ public class TestCaseOfGooglePubSubSource {
         log.info("--------------------------------------------------------------------------------------------");
         log.info("Test to receive messages by creating a new subscription to a topic in google pub sub server.");
         log.info("--------------------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topicA', "
-                        + "subscription.id = 'subA18536432', "
+                        + "subscription.id = 'subA18538611', "
                         + "@map(type = 'text'))"
                         + "Define stream FooStream2 (message string);"
                         + "from FooStream2 select message insert into BarStream2;");
@@ -219,14 +215,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("----------------------------------------------------------------------------");
         log.info("Test to configure the google pub sub source when missing mandatory property.");
         log.info("----------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topicJ', "
                         + "@map(type = 'text'))"
@@ -247,14 +242,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("Test to receive messages by subscribing to topic in an unavailable project of google pubsub server.");
         log.info("---------------------------------------------------------------------------------------------------");
         log = Logger.getLogger(GooglePubSubSource.class);
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sxxxxx04768', "
                         + "topic.id = 'topicA', "
                         + "subscription.id = 'subA1', "
@@ -276,14 +270,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("Test to receive messages by subscribing to topic in by specifying the project id as empty.");
         log.info("------------------------------------------------------------------------------------------");
         log = Logger.getLogger(GooglePubSubSource.class);
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = '', "
                         + "topic.id = 'topicA', "
                         + "subscription.id = 'subA1', "
@@ -306,14 +299,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("Test to receive messages by subscribing to a non-existing topic in google pubsub server.");
         log.info("----------------------------------------------------------------------------------------");
         log = Logger.getLogger(GooglePubSubSource.class);
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topicX', "
                         + "subscription.id = 'subX', "
@@ -334,14 +326,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("---------------------------------------------------------------------------------------------------");
         log.info("Test to receive messages without giving the file name of the service account credentials correctly.");
         log.info("---------------------------------------------------------------------------------------------------");
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'son',"
+                        + "credential.path = 'src/test/resources/security/sp',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topicB', "
                         + "subscription.id = 'subB', "
@@ -363,14 +354,13 @@ public class TestCaseOfGooglePubSubSource {
         log.info("Test to receive messages without a permitted authentication.");
         log.info("------------------------------------------------------------");
         log = Logger.getLogger(GooglePubSubSource.class);
-        System.setProperty("carbon.home", serviceAccountFilePath);
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
                 "@App:name('TestExecutionPlan1') "
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'Blue Eye-3d5d8a888785.json',"
+                        + "credential.path = 'src/test/resources/security/Blue Eye-3d5d8a888785.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topicB', "
                         + "subscription.id = 'subB', "
@@ -391,7 +381,6 @@ public class TestCaseOfGooglePubSubSource {
         log.info("Test to configure Google Pub Sub Source with pausing and resuming functionality.");
         log.info("--------------------------------------------------------------------------------");
         log = Logger.getLogger(GooglePubSubSource.class);
-        System.setProperty("carbon.home", "/home/ayodhya/Videos/siddhi-io-googlepubsub/component/src/test/");
         // deploying the execution plan
         SiddhiManager siddhiManager = new SiddhiManager();
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(
@@ -399,7 +388,7 @@ public class TestCaseOfGooglePubSubSource {
                         + "define stream BarStream2 (message string); "
                         + "@info(name = 'query1') "
                         + "@source(type ='googlepubsub', "
-                        + "file.name = 'sp.json',"
+                        + "credential.path = 'src/test/resources/security/sp.json',"
                         + "project.id = 'sp-path-1547649404768', "
                         + "topic.id = 'topicB', "
                         + "subscription.id = 'subB', "

@@ -27,11 +27,10 @@ public class GooglePubSubConstants {
     public static final String GOOGLE_PUB_SUB_SERVER_PROJECT_ID = "project.id";
     public static final String SUBSCRIPTION_ID = "subscription.id";
     public static final String CREDENTIAL_PATH = "credential.path";
-    public static final String CREDENTIAL_PATH_VALUE = System.getProperty("carbon.home") + "/resources/security/";
-    public static final String CREDENTIAL_FILE_NAME = "file.name";
 
     private GooglePubSubConstants() {
 
     }
 }
+
 
